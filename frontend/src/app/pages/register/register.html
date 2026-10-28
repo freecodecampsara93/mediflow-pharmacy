@@ -1,0 +1,63 @@
+<div class="auth-page">
+  <div class="auth-card card">
+    <div class="auth-heading">
+      <span class="brand-mark">+</span>
+      <h1>Create your account</h1>
+      <p class="text-muted">Sign up to start ordering and tracking your medicines.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field" [class.has-error]="isInvalid('name')">
+        <label for="name">Full name</label>
+        <input id="name" type="text" formControlName="name" autocomplete="name" />
+        @if (isInvalid('name')) {
+          <span class="error-text">Please enter your full name.</span>
+        }
+      </div>
+
+      <div class="field" [class.has-error]="isInvalid('email')">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" autocomplete="email" />
+        @if (isInvalid('email')) {
+          <span class="error-text">Please enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone (optional)</label>
+        <input id="phone" type="tel" formControlName="phone" autocomplete="tel" />
+      </div>
+
+      <div class="field">
+        <label for="address">Address (optional)</label>
+        <input id="address" type="text" formControlName="address" autocomplete="street-address" />
+      </div>
+
+      <div class="field" [class.has-error]="isInvalid('password')">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+        @if (isInvalid('password')) {
+          <span class="error-text">Password must be at least 6 characters.</span>
+        }
+      </div>
+
+      <div class="field" [class.has-error]="isInvalid('confirmPassword') || passwordsMismatch">
+        <label for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+        @if (passwordsMismatch) {
+          <span class="error-text">Passwords do not match.</span>
+        }
+      </div>
+
+      @if (submitError()) {
+        <p class="error-text form-error">{{ submitError() }}</p>
+      }
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="submitting()">
+        {{ submitting() ? 'Creating account...' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a routerLink="/login">Log in</a></p>
+  </div>
+</div>

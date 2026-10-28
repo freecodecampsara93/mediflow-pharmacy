@@ -1,0 +1,10 @@
+<div class="stat-card tone-{{ tone }}">
+  <div class="stat-icon" aria-hidden="true">{{ icon }}</div>
+  <div class="stat-body">
+    <span class="stat-value">{{ value }}</span>
+    <span class="stat-label">{{ label }}</span>
+    @if (hint) {
+      <span class="stat-hint">{{ hint }}</span>
+    }
+  </div>
+</div>

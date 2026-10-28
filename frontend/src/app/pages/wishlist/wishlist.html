@@ -1,0 +1,45 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>Your wishlist</h1>
+    <p class="text-muted">Medicines you've saved for later.</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading your wishlist..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load wishlist" [message]="error()">
+      <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (!wishlistService.items().length) {
+    <app-empty-state icon="♡" title="Your wishlist is empty" message="Tap the heart icon on any medicine to save it here.">
+      <a routerLink="/medicines" class="btn btn-primary">Browse medicines</a>
+    </app-empty-state>
+  } @else {
+    <div class="grid wishlist-grid">
+      @for (item of wishlistService.items(); track item.medicineId) {
+        <div class="card wishlist-card">
+          @if (item.image) {
+            <img [src]="item.image" [alt]="item.name" />
+          } @else {
+            <div class="wishlist-placeholder">{{ item.name.charAt(0) }}</div>
+          }
+          <div class="wishlist-info">
+            <a [routerLink]="['/medicines', item.medicineId]">{{ item.name }}</a>
+            <span class="price">{{ item.price | currency }}</span>
+            @if (!item.active || item.availableStock <= 0) {
+              <span class="badge badge-danger">Unavailable</span>
+            } @else {
+              <span class="badge badge-success">In stock</span>
+            }
+          </div>
+          <div class="wishlist-actions">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="!item.active || item.availableStock <= 0" (click)="addToCart(item)">
+              Add to cart
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="remove(item)">Remove</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

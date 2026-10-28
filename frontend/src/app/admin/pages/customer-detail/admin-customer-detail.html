@@ -1,0 +1,54 @@
+@if (loading()) {
+  <app-loading-spinner label="Loading customer..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load customer" [message]="error()">
+    <a routerLink="/admin/customers" class="btn btn-secondary">Back to customers</a>
+  </app-empty-state>
+} @else if (customer(); as c) {
+  <nav class="breadcrumb">
+    <a routerLink="/admin/customers">Customers</a>
+    <span>/</span>
+    <span>{{ c.name }}</span>
+  </nav>
+
+  <div class="admin-page-heading">
+    <div>
+      <h1>{{ c.name }}</h1>
+      <p class="text-muted">{{ c.email }} · Joined {{ c.createdAt | date: 'mediumDate' }}</p>
+    </div>
+  </div>
+
+  <div class="card info-card">
+    <h3>Contact</h3>
+    <p>Phone: {{ c.phone || 'Not provided' }}</p>
+    <p>Address: {{ c.address || 'Not provided' }}</p>
+  </div>
+
+  <h3 class="section-title">Recent orders</h3>
+  @if (!c.recentOrders.length) {
+    <app-empty-state icon="🧾" title="No orders yet for this customer"></app-empty-state>
+  } @else {
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of c.recentOrders; track order.id) {
+            <tr>
+              <td>#{{ order.id }}</td>
+              <td>{{ order.createdAt | date: 'medium' }}</td>
+              <td>{{ order.totalAmount | currency }}</td>
+              <td><span class="badge" [class]="statusTone(order.status)">{{ order.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

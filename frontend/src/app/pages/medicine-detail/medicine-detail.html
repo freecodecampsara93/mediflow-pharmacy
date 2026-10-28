@@ -1,0 +1,68 @@
+<div class="container section">
+  @if (loading()) {
+    <app-loading-spinner label="Loading medicine..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load medicine" [message]="error()">
+      <a routerLink="/medicines" class="btn btn-secondary">Back to medicines</a>
+    </app-empty-state>
+  } @else if (medicine(); as med) {
+    <nav class="breadcrumb">
+      <a routerLink="/medicines">Medicines</a>
+      <span>/</span>
+      <span>{{ med.name }}</span>
+    </nav>
+
+    <div class="detail-grid">
+      <div class="detail-media">
+        @if (med.image) {
+          <img [src]="med.image" [alt]="med.name" />
+        } @else {
+          <div class="media-placeholder">{{ med.name.charAt(0) }}</div>
+        }
+      </div>
+
+      <div class="detail-info">
+        @if (med.categoryName) {
+          <span class="product-category">{{ med.categoryName }}</span>
+        }
+        <h1>{{ med.name }}</h1>
+        <p class="manufacturer">by {{ med.manufacturer || 'Generic manufacturer' }} · SKU {{ med.sku }}</p>
+
+        <div class="badges">
+          @if (med.prescriptionRequired) {
+            <span class="badge badge-warning">Prescription required</span>
+          }
+          @if (inStock) {
+            <span class="badge badge-success">In stock ({{ med.totalStock }} available)</span>
+          } @else {
+            <span class="badge badge-danger">Out of stock</span>
+          }
+          @if (nearestExpiry(); as batch) {
+            <span class="badge badge-neutral">Nearest batch expiry: {{ batch.expiryDate | date: 'mediumDate' }}</span>
+          }
+        </div>
+
+        <p class="price">{{ med.price | currency }}</p>
+
+        <p class="description">{{ med.description || 'No description provided for this medicine yet.' }}</p>
+
+        <div class="purchase-row">
+          <div class="qty-control">
+            <button type="button" (click)="decrement()" [disabled]="quantity() <= 1" aria-label="Decrease quantity">−</button>
+            <span>{{ quantity() }}</span>
+            <button type="button" (click)="increment()" [disabled]="quantity() >= (med.totalStock ?? 0)" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="btn btn-primary" [disabled]="!inStock" (click)="addToCart()">Add to cart</button>
+          <button type="button" class="btn btn-secondary" [class.active-wish]="isWishlisted" (click)="toggleWishlist()">
+            {{ isWishlisted ? '♥ Wishlisted' : '♡ Add to wishlist' }}
+          </button>
+        </div>
+
+        <div class="info-note">
+          This page shows catalog and inventory information only. It is not medical advice —
+          please consult a pharmacist or doctor for guidance on medication use.
+        </div>
+      </div>
+    </div>
+  }
+</div>

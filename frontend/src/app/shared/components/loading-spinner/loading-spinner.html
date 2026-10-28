@@ -1,0 +1,6 @@
+<div class="spinner-wrap" [class.inline]="inline">
+  <span class="spinner" role="status" aria-live="polite" [attr.aria-label]="label"></span>
+  @if (!inline) {
+    <p>{{ label }}</p>
+  }
+</div>

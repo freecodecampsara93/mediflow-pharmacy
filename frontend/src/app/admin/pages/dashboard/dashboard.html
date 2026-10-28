@@ -1,0 +1,35 @@
+<div class="page-heading">
+  <h1>Dashboard</h1>
+  <p class="text-muted">A quick overview of your pharmacy's health.</p>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading dashboard..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load dashboard" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+  </app-empty-state>
+} @else if (stats(); as s) {
+  <div class="stat-grid">
+    <app-stat-card icon="💊" label="Total medicines" [value]="s.totalMedicines" tone="primary"></app-stat-card>
+    <app-stat-card icon="✅" label="Active medicines" [value]="s.activeMedicines" tone="success"></app-stat-card>
+    <app-stat-card icon="📉" label="Low stock" [value]="s.lowStock" tone="warning"></app-stat-card>
+    <app-stat-card icon="⏳" label="Expiring soon" [value]="s.expiringSoon" tone="warning"></app-stat-card>
+    <app-stat-card icon="⛔" label="Expired" [value]="s.expired" tone="danger"></app-stat-card>
+    <app-stat-card icon="🚚" label="Suppliers" [value]="s.totalSuppliers" tone="neutral"></app-stat-card>
+    <app-stat-card icon="👥" label="Customers" [value]="s.totalCustomers" tone="neutral"></app-stat-card>
+    <app-stat-card icon="🧾" label="Today's orders" [value]="s.todaysOrders" tone="primary"></app-stat-card>
+    <app-stat-card icon="📦" label="Total orders" [value]="s.totalOrders" tone="neutral"></app-stat-card>
+    <app-stat-card icon="💰" label="Revenue" [value]="s.revenue | currency" tone="success"></app-stat-card>
+  </div>
+
+  <div class="quick-links card">
+    <h3>Quick actions</h3>
+    <div class="links-grid">
+      <a routerLink="/admin/medicines" class="btn btn-secondary">Manage medicines</a>
+      <a routerLink="/admin/orders" class="btn btn-secondary">View orders</a>
+      <a routerLink="/admin/expiry" class="btn btn-secondary">Check expiring batches</a>
+      <a routerLink="/admin/inventory" class="btn btn-secondary">Review inventory</a>
+    </div>
+  </div>
+}

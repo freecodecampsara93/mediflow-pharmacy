@@ -1,0 +1,92 @@
+<div class="site">
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" routerLink="/" (click)="closeMenu()">
+        <span class="brand-mark">+</span>
+        <span class="brand-name">MediFlow<span class="brand-accent">Pharmacy</span></span>
+      </a>
+
+      <nav class="main-nav" [class.open]="menuOpen()">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Home</a>
+        <a routerLink="/medicines" routerLinkActive="active" (click)="closeMenu()">Medicines</a>
+        <a routerLink="/categories" routerLinkActive="active" (click)="closeMenu()">Categories</a>
+        @if (auth.isAuthenticated()) {
+          <a routerLink="/orders" routerLinkActive="active" (click)="closeMenu()">My Orders</a>
+        }
+
+        <form class="nav-search" (ngSubmit)="submitSearch()">
+          <input
+            type="search"
+            placeholder="Search medicines..."
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)"
+            aria-label="Search medicines"
+          />
+          <button type="submit" aria-label="Search">🔍</button>
+        </form>
+      </nav>
+
+      <div class="header-actions">
+        <a class="icon-link" routerLink="/wishlist" title="Wishlist" aria-label="Wishlist">♡</a>
+        <a class="icon-link cart-link" routerLink="/cart" title="Cart" aria-label="Cart">
+          🛒
+          @if (cart.itemCount() > 0) {
+            <span class="cart-badge">{{ cart.itemCount() }}</span>
+          }
+        </a>
+
+        @if (auth.isAuthenticated()) {
+          <div class="user-chip">
+            <span>Hi, {{ auth.user()?.name?.split(' ')?.[0] }}</span>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="logout()">Logout</button>
+          </div>
+        } @else {
+          <a class="btn btn-secondary btn-sm" routerLink="/login">Login</a>
+          <a class="btn btn-primary btn-sm" routerLink="/register">Register</a>
+        }
+
+        <button type="button" class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <span class="brand-mark">+</span>
+        <span class="brand-name">MediFlow<span class="brand-accent">Pharmacy</span></span>
+        <p>Your trusted neighbourhood pharmacy management &amp; ordering platform.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a routerLink="/medicines">All Medicines</a>
+        <a routerLink="/categories">Categories</a>
+        <a routerLink="/wishlist">Wishlist</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a routerLink="/orders">My Orders</a>
+        <a routerLink="/cart">Cart</a>
+        <a routerLink="/login">Login</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Safety</h4>
+        <p class="footer-note">
+          Always read the label and follow the guidance of a licensed pharmacist or physician.
+          This platform provides catalog and ordering information only — it does not offer medical advice.
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom container">
+      <span>© {{ currentYear }} MediFlow Pharmacy. All rights reserved.</span>
+      <a routerLink="/admin/login">Admin portal</a>
+    </div>
+  </footer>
+</div>

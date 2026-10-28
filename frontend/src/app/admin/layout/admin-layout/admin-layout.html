@@ -1,0 +1,36 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-brand">
+      <span class="brand-mark">+</span>
+      <span>MediFlow <small>Admin</small></span>
+    </div>
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" (click)="closeSidebar()">
+          <span class="nav-icon">{{ item.icon }}</span>
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+    <a class="storefront-link" routerLink="/" (click)="closeSidebar()">← Back to storefront</a>
+  </aside>
+
+  @if (sidebarOpen()) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+  }
+
+  <div class="admin-content">
+    <header class="admin-topbar">
+      <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle menu">☰</button>
+      <span class="topbar-title">Pharmacy Control Center</span>
+      <div class="topbar-user">
+        <span>{{ auth.user()?.name }}</span>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

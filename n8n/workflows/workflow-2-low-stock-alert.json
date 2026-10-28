@@ -1,0 +1,89 @@
+{
+  "name": "MediFlow - Low Stock Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "low-stock-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "2b2b2b2b-0001-4000-8000-000000000001",
+      "name": "Low Stock Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "mediflow-low-stock-webhook"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "medicineName",
+              "type": "string",
+              "value": "={{ $json.body.medicineName }}"
+            },
+            {
+              "id": "f2",
+              "name": "remainingStock",
+              "type": "number",
+              "value": "={{ $json.body.remainingStock }}"
+            },
+            {
+              "id": "f3",
+              "name": "minimumStock",
+              "type": "number",
+              "value": "={{ $json.body.minimumStock }}"
+            },
+            {
+              "id": "f4",
+              "name": "medicineId",
+              "type": "number",
+              "value": "={{ $json.body.medicineId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b2b2b2b-0002-4000-8000-000000000002",
+      "name": "Format Low Stock Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "admin@yourpharmacy.example",
+        "subject": "=Low stock: {{ $json.medicineName }}",
+        "emailType": "html",
+        "message": "=<p>Stock for <strong>{{ $json.medicineName }}</strong> (ID {{ $json.medicineId }}) has dropped below the minimum threshold.</p><ul><li>Remaining stock: {{ $json.remainingStock }}</li><li>Minimum stock: {{ $json.minimumStock }}</li></ul><p>Please reorder from a supplier soon.</p>",
+        "options": {}
+      },
+      "id": "2b2b2b2b-0003-4000-8000-000000000003",
+      "name": "Gmail - Admin Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Low Stock Webhook": {
+      "main": [[{ "node": "Format Low Stock Data", "type": "main", "index": 0 }]]
+    },
+    "Format Low Stock Data": {
+      "main": [[{ "node": "Gmail - Admin Alert", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

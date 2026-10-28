@@ -1,0 +1,63 @@
+<div class="container section">
+  @if (loading()) {
+    <app-loading-spinner label="Loading order..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load order" [message]="error()">
+      <a routerLink="/orders" class="btn btn-secondary">Back to orders</a>
+    </app-empty-state>
+  } @else if (order(); as ord) {
+    <nav class="breadcrumb">
+      <a routerLink="/orders">My orders</a>
+      <span>/</span>
+      <span>Order #{{ ord.id }}</span>
+    </nav>
+
+    <div class="page-heading flex-between">
+      <div>
+        <h1>Order #{{ ord.id }}</h1>
+        <p class="text-muted">Placed on {{ ord.createdAt | date: 'medium' }}</p>
+      </div>
+      <span class="badge badge-neutral status-badge">{{ ord.status }}</span>
+    </div>
+
+    @if (ord.status !== 'cancelled') {
+      <div class="status-tracker card">
+        @for (step of statusSteps; track step; let i = $index) {
+          <div class="tracker-step" [class.done]="i <= stepIndex(ord.status)">
+            <span class="tracker-dot"></span>
+            <span class="tracker-label">{{ step }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="detail-layout">
+      <div class="card items-card">
+        <h3>Items</h3>
+        @for (item of ord.items; track item.id) {
+          <div class="item-row">
+            <span>{{ item.medicineName }} × {{ item.quantity }}</span>
+            <span>{{ item.lineTotal | currency }}</span>
+          </div>
+        }
+        <div class="item-row total">
+          <span>Total</span>
+          <span>{{ ord.totalAmount | currency }}</span>
+        </div>
+      </div>
+
+      <div class="card info-card">
+        <h3>Shipping details</h3>
+        <p><strong>{{ ord.shippingName }}</strong></p>
+        <p>{{ ord.shippingPhone }}</p>
+        <p>{{ ord.shippingAddress }}</p>
+
+        <h3>Payment</h3>
+        <p>{{ ord.paymentMethod === 'cash_on_delivery' ? 'Cash on delivery' : 'Mock payment' }}</p>
+        @if (ord.payment) {
+          <p class="text-muted">Status: {{ ord.payment.status }}</p>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,47 @@
+.admin-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: radial-gradient(circle at top, var(--color-primary-900), #06201f 70%);
+}
+
+.admin-auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6);
+}
+
+.auth-heading {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.auth-heading .brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin-bottom: var(--space-3);
+}
+
+.form-error {
+  margin-bottom: var(--space-3);
+}
+
+.demo-hint {
+  margin-top: var(--space-5);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}

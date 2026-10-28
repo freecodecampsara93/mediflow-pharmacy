@@ -1,0 +1,21 @@
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-5);
+}
+
+.info-card {
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.info-card p {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  margin-bottom: var(--space-4);
+}

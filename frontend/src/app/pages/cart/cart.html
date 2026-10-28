@@ -1,0 +1,75 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>Your cart</h1>
+    <p class="text-muted">Review your items before checking out.</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading your cart..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load cart" [message]="error()">
+      <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (!cartService.cart().items.length) {
+    <app-empty-state icon="🛒" title="Your cart is empty" message="Browse our catalog and add items you need.">
+      <a routerLink="/medicines" class="btn btn-primary">Browse medicines</a>
+    </app-empty-state>
+  } @else {
+    <div class="cart-layout">
+      <div class="cart-items">
+        @for (item of cartService.cart().items; track item.medicineId) {
+          <div class="cart-item card">
+            @if (item.image) {
+              <img [src]="item.image" [alt]="item.name" />
+            } @else {
+              <div class="cart-item-placeholder">{{ item.name.charAt(0) }}</div>
+            }
+
+            <div class="cart-item-info">
+              <a [routerLink]="['/medicines', item.medicineId]">{{ item.name }}</a>
+              <span class="unit-price">{{ item.price | currency }} each</span>
+              @if (!item.active) {
+                <span class="badge badge-danger">No longer available</span>
+              } @else if (item.quantity > item.availableStock) {
+                <span class="badge badge-warning">Only {{ item.availableStock }} left in stock</span>
+              }
+            </div>
+
+            <div class="qty-control" [class.busy]="updatingId() === item.medicineId">
+              <button type="button" (click)="changeQuantity(item, -1)" [disabled]="item.quantity <= 1" aria-label="Decrease quantity">−</button>
+              <span>{{ item.quantity }}</span>
+              <button
+                type="button"
+                (click)="changeQuantity(item, 1)"
+                [disabled]="item.quantity >= item.availableStock"
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+
+            <span class="line-total">{{ item.lineTotal | currency }}</span>
+
+            <button type="button" class="remove-btn" (click)="removeItem(item)" aria-label="Remove item">🗑</button>
+          </div>
+        }
+
+        <button type="button" class="btn btn-ghost" (click)="clearCart()">Clear cart</button>
+      </div>
+
+      <aside class="cart-summary card">
+        <h3>Order summary</h3>
+        <div class="summary-row">
+          <span>Items ({{ cartService.itemCount() }})</span>
+          <span>{{ cartService.cart().total | currency }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>{{ cartService.cart().total | currency }}</span>
+        </div>
+        <a routerLink="/checkout" class="btn btn-primary btn-block">Proceed to checkout</a>
+        <a routerLink="/medicines" class="btn btn-ghost btn-block">Continue shopping</a>
+      </aside>
+    </div>
+  }
+</div>

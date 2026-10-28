@@ -1,0 +1,35 @@
+<div class="container section">
+  @if (loading()) {
+    <app-loading-spinner label="Loading category..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load category" [message]="error()">
+      <a routerLink="/categories" class="btn btn-secondary">Back to categories</a>
+    </app-empty-state>
+  } @else if (category(); as cat) {
+    <nav class="breadcrumb">
+      <a routerLink="/categories">Categories</a>
+      <span>/</span>
+      <span>{{ cat.name }}</span>
+    </nav>
+
+    <div class="page-heading">
+      <h1>{{ cat.name }}</h1>
+      <p class="text-muted">{{ cat.description || 'Medicines in this category.' }}</p>
+    </div>
+
+    @if (!medicines().length) {
+      <app-empty-state icon="💊" title="No medicines in this category yet"></app-empty-state>
+    } @else {
+      <div class="grid product-grid">
+        @for (med of medicines(); track med.id) {
+          <app-product-card
+            [medicine]="med"
+            [wishlisted]="isWishlisted(med.id)"
+            (addToCart)="addToCart($event)"
+            (toggleWishlist)="toggleWishlist($event)"
+          ></app-product-card>
+        }
+      </div>
+    }
+  }
+</div>

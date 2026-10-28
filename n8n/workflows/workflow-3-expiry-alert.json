@@ -1,0 +1,129 @@
+{
+  "name": "MediFlow - Expiry Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "expiry-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "3c3c3c3c-0001-4000-8000-000000000001",
+      "name": "Expiry Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 460],
+      "webhookId": "mediflow-expiry-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "days", "daysInterval": 1, "triggerAtHour": 8 }]
+        }
+      },
+      "id": "3c3c3c3c-0004-4000-8000-000000000004",
+      "name": "Daily 08:00 Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [260, 140]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MEDIFLOW_BACKEND_URL }}/api/admin/notify/expiring-batches",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "days", "value": "30" }]
+        },
+        "options": { "timeout": 5000 }
+      },
+      "id": "3c3c3c3c-0005-4000-8000-000000000005",
+      "name": "Trigger Expiry Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 140],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_ADMIN_BEARER_TOKEN_CREDENTIAL_ID",
+          "name": "MediFlow Admin Bearer Token"
+        }
+      },
+      "notes": "This node calls the backend, which then re-POSTs one Expiry Webhook event per expiring batch back into this same workflow's webhook trigger below."
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "medicineName",
+              "type": "string",
+              "value": "={{ $json.body.medicineName }}"
+            },
+            {
+              "id": "f2",
+              "name": "batchNumber",
+              "type": "string",
+              "value": "={{ $json.body.batchNumber }}"
+            },
+            {
+              "id": "f3",
+              "name": "expiryDate",
+              "type": "string",
+              "value": "={{ $json.body.expiryDate }}"
+            },
+            {
+              "id": "f4",
+              "name": "medicineId",
+              "type": "number",
+              "value": "={{ $json.body.medicineId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c3c3c3c-0002-4000-8000-000000000002",
+      "name": "Format Expiry Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 460]
+    },
+    {
+      "parameters": {
+        "sendTo": "admin@yourpharmacy.example",
+        "subject": "=Expiry alert: {{ $json.medicineName }} (batch {{ $json.batchNumber }})",
+        "emailType": "html",
+        "message": "=<p><strong>{{ $json.medicineName }}</strong> (ID {{ $json.medicineId }}), batch <strong>{{ $json.batchNumber }}</strong>, expires on {{ $json.expiryDate }}.</p><p>Please review this stock for markdown, return to supplier, or disposal per your pharmacy's policy.</p>",
+        "options": {}
+      },
+      "id": "3c3c3c3c-0003-4000-8000-000000000003",
+      "name": "Gmail - Admin Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 460],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 08:00 Schedule": {
+      "main": [[{ "node": "Trigger Expiry Check", "type": "main", "index": 0 }]]
+    },
+    "Expiry Webhook": {
+      "main": [[{ "node": "Format Expiry Data", "type": "main", "index": 0 }]]
+    },
+    "Format Expiry Data": {
+      "main": [[{ "node": "Gmail - Admin Alert", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

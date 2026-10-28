@@ -1,0 +1,75 @@
+<div class="admin-page-heading">
+  <div>
+    <h1>Reports</h1>
+    <p class="text-muted">A snapshot of revenue, stock health, and expiry risk.</p>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner label="Building reports..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load reports" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+  </app-empty-state>
+} @else if (stats(); as s) {
+  <div class="stat-grid">
+    <app-stat-card icon="💰" label="Total revenue" [value]="s.revenue | currency" tone="success"></app-stat-card>
+    <app-stat-card icon="🧾" label="Total orders" [value]="s.totalOrders" tone="primary"></app-stat-card>
+    <app-stat-card icon="📅" label="Today's orders" [value]="s.todaysOrders" tone="neutral"></app-stat-card>
+    <app-stat-card icon="👥" label="Customers" [value]="s.totalCustomers" tone="neutral"></app-stat-card>
+  </div>
+
+  <div class="report-grid">
+    <div class="card report-card">
+      <h3>Low stock medicines</h3>
+      @if (!lowStock().length) {
+        <p class="text-muted">No medicines are currently below their minimum stock threshold.</p>
+      } @else {
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Stock</th>
+              <th>Minimum</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of lowStock(); track item.medicineId) {
+              <tr>
+                <td>{{ item.medicineName }}</td>
+                <td>{{ item.totalStock }}</td>
+                <td>{{ item.minimumStock }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="card report-card">
+      <h3>Expiring soon</h3>
+      @if (!expiringSoon().length) {
+        <p class="text-muted">No batches are expiring within the configured warning window.</p>
+      } @else {
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Batch #</th>
+              <th>Expiry</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (batch of expiringSoon(); track batch.id) {
+              <tr>
+                <td>{{ batch.medicineName }}</td>
+                <td>{{ batch.batchNumber }}</td>
+                <td>{{ batch.expiryDate | date: 'mediumDate' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </div>
+}

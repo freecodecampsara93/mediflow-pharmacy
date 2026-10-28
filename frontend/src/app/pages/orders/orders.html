@@ -1,0 +1,32 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>My orders</h1>
+    <p class="text-muted">Track the status of your past orders.</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading your orders..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load orders" [message]="error()">
+      <button type="button" class="btn btn-secondary" (click)="load(1)">Try again</button>
+    </app-empty-state>
+  } @else if (!orders().length) {
+    <app-empty-state icon="🧾" title="No orders yet" message="Your placed orders will show up here.">
+      <a routerLink="/medicines" class="btn btn-primary">Start shopping</a>
+    </app-empty-state>
+  } @else {
+    <div class="orders-list">
+      @for (order of orders(); track order.id) {
+        <a class="order-row card" [routerLink]="['/orders', order.id]">
+          <div class="order-main">
+            <strong>Order #{{ order.id }}</strong>
+            <span class="text-muted">{{ order.createdAt | date: 'medium' }}</span>
+          </div>
+          <span class="badge" [class]="statusTone(order.status)">{{ order.status }}</span>
+          <span class="order-total">{{ order.totalAmount | currency }}</span>
+        </a>
+      }
+    </div>
+    <app-paginator [pagination]="pagination()" (pageChange)="load($event)"></app-paginator>
+  }
+</div>

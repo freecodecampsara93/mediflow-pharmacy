@@ -1,0 +1,11 @@
+@if (pagination.totalPages > 1) {
+  <nav class="paginator" aria-label="Pagination">
+    <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasPrev" (click)="goTo(pagination.page - 1)">
+      ‹ Prev
+    </button>
+    <span class="paginator-info">Page {{ pagination.page }} of {{ pagination.totalPages }}</span>
+    <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasNext" (click)="goTo(pagination.page + 1)">
+      Next ›
+    </button>
+  </nav>
+}

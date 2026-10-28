@@ -1,0 +1,30 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>Categories</h1>
+    <p class="text-muted">Find medicines organised by category.</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading categories..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load categories" [message]="error()">
+      <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (!categories().length) {
+    <app-empty-state icon="🗂️" title="No categories yet"></app-empty-state>
+  } @else {
+    <div class="grid category-grid">
+      @for (cat of categories(); track cat.id) {
+        <a class="category-card card" [routerLink]="['/categories', cat.id]">
+          @if (cat.image) {
+            <img [src]="cat.image" [alt]="cat.name" />
+          } @else {
+            <div class="category-icon">🗂️</div>
+          }
+          <h3>{{ cat.name }}</h3>
+          <p>{{ cat.description || 'Browse medicines in this category.' }}</p>
+        </a>
+      }
+    </div>
+  }
+</div>

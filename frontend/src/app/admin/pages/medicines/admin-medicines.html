@@ -1,0 +1,148 @@
+<div class="admin-page-heading">
+  <div>
+    <h1>Medicines</h1>
+    <p class="text-muted">Manage your medicine catalog.</p>
+  </div>
+  <button type="button" class="btn btn-primary" (click)="openCreate()">+ Add medicine</button>
+</div>
+
+<div class="admin-toolbar">
+  <input
+    type="search"
+    placeholder="Search by name, SKU or manufacturer..."
+    [value]="searchTerm()"
+    (input)="searchTerm.set($any($event.target).value)"
+    (keyup.enter)="search()"
+  />
+  <button type="button" class="btn btn-secondary btn-sm" (click)="search()">Search</button>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading medicines..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load medicines" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load(1)">Try again</button>
+  </app-empty-state>
+} @else if (!medicines().length) {
+  <app-empty-state icon="💊" title="No medicines found"></app-empty-state>
+} @else {
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>SKU</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Rx</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (med of medicines(); track med.id) {
+          <tr>
+            <td>{{ med.name }}</td>
+            <td>{{ med.sku }}</td>
+            <td>{{ med.categoryName || '—' }}</td>
+            <td>{{ med.price | currency }}</td>
+            <td>{{ med.totalStock ?? 0 }}</td>
+            <td>
+              <span class="badge" [class]="med.active ? 'badge-success' : 'badge-neutral'">
+                {{ med.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>{{ med.prescriptionRequired ? 'Yes' : 'No' }}</td>
+            <td class="row-actions">
+              <button type="button" class="btn btn-secondary btn-sm" (click)="openEdit(med)">Edit</button>
+              <button type="button" class="btn btn-danger btn-sm" (click)="remove(med)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-paginator [pagination]="pagination()" (pageChange)="load($event)"></app-paginator>
+}
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <h3>{{ editingId() ? 'Edit medicine' : 'Add medicine' }}</h3>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="field field-full" [class.has-error]="isInvalid('name')">
+            <label for="m-name">Name</label>
+            <input id="m-name" type="text" formControlName="name" />
+            @if (isInvalid('name')) {
+              <span class="error-text">Name is required.</span>
+            }
+          </div>
+
+          <div class="field" [class.has-error]="isInvalid('sku')">
+            <label for="m-sku">SKU</label>
+            <input id="m-sku" type="text" formControlName="sku" />
+            @if (isInvalid('sku')) {
+              <span class="error-text">SKU is required.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="m-category">Category</label>
+            <select id="m-category" formControlName="categoryId">
+              <option value="">No category</option>
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="m-manufacturer">Manufacturer</label>
+            <input id="m-manufacturer" type="text" formControlName="manufacturer" />
+          </div>
+
+          <div class="field" [class.has-error]="isInvalid('price')">
+            <label for="m-price">Price</label>
+            <input id="m-price" type="number" min="0" step="0.01" formControlName="price" />
+            @if (isInvalid('price')) {
+              <span class="error-text">Price must be zero or more.</span>
+            }
+          </div>
+
+          <div class="field field-full">
+            <label for="m-description">Description</label>
+            <textarea id="m-description" rows="3" formControlName="description"></textarea>
+          </div>
+
+          <div class="field field-full">
+            <label for="m-image">Image URL</label>
+            <input id="m-image" type="text" formControlName="image" placeholder="https://..." />
+          </div>
+
+          <label class="checkbox-field">
+            <input type="checkbox" formControlName="prescriptionRequired" />
+            Prescription required
+          </label>
+
+          <label class="checkbox-field">
+            <input type="checkbox" formControlName="active" />
+            Active (visible to customers)
+          </label>
+        </div>
+
+        @if (formError()) {
+          <p class="error-text">{{ formError() }}</p>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save medicine' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

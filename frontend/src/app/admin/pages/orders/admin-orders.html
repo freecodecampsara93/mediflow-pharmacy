@@ -1,0 +1,55 @@
+<div class="admin-page-heading">
+  <div>
+    <h1>Orders</h1>
+    <p class="text-muted">View and manage all customer orders.</p>
+  </div>
+</div>
+
+<div class="admin-toolbar">
+  <select [value]="statusFilter()" (change)="onFilterChange($any($event.target).value)">
+    <option value="">All statuses</option>
+    @for (s of statuses; track s) {
+      <option [value]="s">{{ s }}</option>
+    }
+  </select>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading orders..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load orders" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load(1)">Try again</button>
+  </app-empty-state>
+} @else if (!orders().length) {
+  <app-empty-state icon="🧾" title="No orders found"></app-empty-state>
+} @else {
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of orders(); track order.id) {
+          <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.customerName }}<br /><span class="text-muted">{{ order.customerEmail }}</span></td>
+            <td>{{ order.createdAt | date: 'medium' }}</td>
+            <td>{{ order.totalAmount | currency }}</td>
+            <td><span class="badge" [class]="statusTone(order.status)">{{ order.status }}</span></td>
+            <td class="row-actions">
+              <a [routerLink]="['/admin/orders', order.id]" class="btn btn-secondary btn-sm">View</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-paginator [pagination]="pagination()" (pageChange)="load($event)"></app-paginator>
+}

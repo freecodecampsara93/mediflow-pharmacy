@@ -1,0 +1,84 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>Checkout</h1>
+    <p class="text-muted">Confirm your shipping details and payment method.</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Preparing checkout..."></app-loading-spinner>
+  } @else if (cartEmpty) {
+    <app-empty-state icon="🛒" title="Your cart is empty" message="Add items to your cart before checking out.">
+      <a routerLink="/medicines" class="btn btn-primary">Browse medicines</a>
+    </app-empty-state>
+  } @else {
+    <div class="checkout-layout">
+      <form class="card checkout-form" [formGroup]="form" (ngSubmit)="submit()">
+        <h3>Shipping details</h3>
+
+        <div class="field" [class.has-error]="isInvalid('shippingName')">
+          <label for="shippingName">Full name</label>
+          <input id="shippingName" type="text" formControlName="shippingName" />
+          @if (isInvalid('shippingName')) {
+            <span class="error-text">Please enter your full name.</span>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="isInvalid('shippingPhone')">
+          <label for="shippingPhone">Phone number</label>
+          <input id="shippingPhone" type="tel" formControlName="shippingPhone" />
+          @if (isInvalid('shippingPhone')) {
+            <span class="error-text">Please enter a valid phone number.</span>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="isInvalid('shippingAddress')">
+          <label for="shippingAddress">Delivery address</label>
+          <textarea id="shippingAddress" rows="3" formControlName="shippingAddress"></textarea>
+          @if (isInvalid('shippingAddress')) {
+            <span class="error-text">Please enter your delivery address.</span>
+          }
+        </div>
+
+        <h3>Payment method</h3>
+        <div class="payment-options">
+          <label class="payment-option">
+            <input type="radio" formControlName="paymentMethod" value="cash_on_delivery" />
+            <div>
+              <strong>Cash on delivery</strong>
+              <span>Pay with cash when your order arrives.</span>
+            </div>
+          </label>
+          <label class="payment-option">
+            <input type="radio" formControlName="paymentMethod" value="mock_payment" />
+            <div>
+              <strong>Mock payment (demo)</strong>
+              <span>Simulated payment for demonstration purposes — no real card details required.</span>
+            </div>
+          </label>
+        </div>
+
+        @if (submitError()) {
+          <p class="error-text form-error">{{ submitError() }}</p>
+        }
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="submitting()">
+          {{ submitting() ? 'Placing order...' : 'Confirm order' }}
+        </button>
+      </form>
+
+      <aside class="card order-summary">
+        <h3>Order summary</h3>
+        @for (item of cartService.cart().items; track item.medicineId) {
+          <div class="summary-line">
+            <span>{{ item.name }} × {{ item.quantity }}</span>
+            <span>{{ item.lineTotal | currency }}</span>
+          </div>
+        }
+        <div class="summary-line total">
+          <span>Total</span>
+          <span>{{ cartService.cart().total | currency }}</span>
+        </div>
+      </aside>
+    </div>
+  }
+</div>

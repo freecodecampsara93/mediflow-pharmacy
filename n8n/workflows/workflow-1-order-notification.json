@@ -1,0 +1,126 @@
+{
+  "name": "MediFlow - Order Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "1a1a1a1a-0001-4000-8000-000000000001",
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "mediflow-order-webhook"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "itemsListHtml",
+              "type": "string",
+              "value": "={{ $json.body.items.map(i => `<li>${i.quantity} x ${i.medicineName} - $${i.unitPrice.toFixed(2)} each</li>`).join('') }}"
+            },
+            {
+              "id": "f2",
+              "name": "formattedTotal",
+              "type": "string",
+              "value": "={{ '$' + $json.body.totalAmount.toFixed(2) }}"
+            },
+            {
+              "id": "f3",
+              "name": "orderId",
+              "type": "number",
+              "value": "={{ $json.body.orderId }}"
+            },
+            {
+              "id": "f4",
+              "name": "customerName",
+              "type": "string",
+              "value": "={{ $json.body.customerName }}"
+            },
+            {
+              "id": "f5",
+              "name": "customerEmail",
+              "type": "string",
+              "value": "={{ $json.body.customerEmail }}"
+            },
+            {
+              "id": "f6",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.body.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a1a1a1a-0002-4000-8000-000000000002",
+      "name": "Format Order Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customerEmail }}",
+        "subject": "=Your MediFlow Pharmacy order #{{ $json.orderId }} is confirmed",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p><p>Thanks for your order! Here is your summary:</p><ul>{{ $json.itemsListHtml }}</ul><p><strong>Total: {{ $json.formattedTotal }}</strong></p><p>Status: {{ $json.status }}</p><p>- MediFlow Pharmacy</p>",
+        "options": {}
+      },
+      "id": "1a1a1a1a-0003-4000-8000-000000000003",
+      "name": "Gmail - Customer Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "orders@yourpharmacy.example",
+        "subject": "=New order #{{ $json.orderId }} received",
+        "emailType": "html",
+        "message": "=<p>New order from {{ $json.customerName }} ({{ $json.customerEmail }}).</p><ul>{{ $json.itemsListHtml }}</ul><p><strong>Total: {{ $json.formattedTotal }}</strong></p>",
+        "options": {}
+      },
+      "id": "1a1a1a1a-0004-4000-8000-000000000004",
+      "name": "Gmail - Pharmacy Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [[{ "node": "Format Order Data", "type": "main", "index": 0 }]]
+    },
+    "Format Order Data": {
+      "main": [
+        [
+          { "node": "Gmail - Customer Confirmation", "type": "main", "index": 0 },
+          { "node": "Gmail - Pharmacy Notification", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

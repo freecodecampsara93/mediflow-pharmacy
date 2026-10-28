@@ -1,0 +1,19 @@
+{
+  "name": "mediflow-pharmacy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root orchestration scripts for the MediFlow Pharmacy monorepo (backend/, frontend/, database/).",
+  "scripts": {
+    "db:seed": "ts-node database/seed.ts"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "pg": "^8.13.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

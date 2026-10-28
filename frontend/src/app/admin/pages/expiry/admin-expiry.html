@@ -1,0 +1,66 @@
+<div class="admin-page-heading">
+  <div>
+    <h1>Expiry tracking</h1>
+    <p class="text-muted">Stay ahead of batches nearing or past their expiry date.</p>
+  </div>
+</div>
+
+<div class="tab-row">
+  <button type="button" class="tab-btn" [class.active]="tab() === 'expiring'" (click)="setTab('expiring')">Expiring soon</button>
+  <button type="button" class="tab-btn" [class.active]="tab() === 'expired'" (click)="setTab('expired')">Expired</button>
+</div>
+
+@if (tab() === 'expiring') {
+  <div class="admin-toolbar">
+    <label for="days">Within</label>
+    <input id="days" type="number" min="1" style="width:90px" [(ngModel)]="days" (change)="load()" />
+    <span>days</span>
+  </div>
+}
+
+@if (loading()) {
+  <app-loading-spinner label="Loading batches..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load data" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+  </app-empty-state>
+} @else if (!batches().length) {
+  <app-empty-state
+    icon="✅"
+    [title]="tab() === 'expiring' ? 'Nothing expiring soon' : 'No expired batches'"
+    message="Great news — inventory looks healthy for this view."
+  ></app-empty-state>
+} @else {
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Batch #</th>
+          <th>Medicine</th>
+          <th>Supplier</th>
+          <th>Quantity</th>
+          <th>Expiry date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of batches(); track b.id) {
+          <tr>
+            <td>{{ b.batchNumber }}</td>
+            <td>{{ b.medicineName || '—' }}</td>
+            <td>{{ b.supplierName || '—' }}</td>
+            <td>{{ b.quantity }}</td>
+            <td>{{ b.expiryDate | date: 'mediumDate' }}</td>
+            <td>
+              @if (tab() === 'expired') {
+                <span class="badge badge-danger">Expired</span>
+              } @else {
+                <span class="badge badge-warning">Expiring soon</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

@@ -1,0 +1,63 @@
+<div class="container section">
+  <div class="page-heading">
+    <h1>Medicines</h1>
+    <p class="text-muted">Browse our full catalog of verified medicines and health products.</p>
+  </div>
+
+  <div class="filters card">
+    <div class="field">
+      <label for="search">Search</label>
+      <input id="search" type="search" [(ngModel)]="search" placeholder="Name, SKU or manufacturer" (keyup.enter)="applyFilters()" />
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" [(ngModel)]="categoryId">
+        <option value="">All categories</option>
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="minPrice">Min price</label>
+      <input id="minPrice" type="number" min="0" step="0.01" [(ngModel)]="minPrice" placeholder="0" />
+    </div>
+    <div class="field">
+      <label for="maxPrice">Max price</label>
+      <input id="maxPrice" type="number" min="0" step="0.01" [(ngModel)]="maxPrice" placeholder="Any" />
+    </div>
+    <div class="field checkbox-col">
+      <label class="checkbox-field">
+        <input type="checkbox" [(ngModel)]="inStockOnly" />
+        In stock only
+      </label>
+    </div>
+    <div class="filter-actions">
+      <button type="button" class="btn btn-primary" (click)="applyFilters()">Apply filters</button>
+      <button type="button" class="btn btn-ghost" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading medicines..."></app-loading-spinner>
+  } @else if (error()) {
+    <app-empty-state icon="⚠️" title="Could not load medicines" [message]="error()">
+      <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (!medicines().length) {
+    <app-empty-state icon="🔍" title="No medicines found" message="Try adjusting your filters or search term."></app-empty-state>
+  } @else {
+    <p class="result-count text-muted">{{ pagination().total }} result(s)</p>
+    <div class="grid product-grid">
+      @for (med of medicines(); track med.id) {
+        <app-product-card
+          [medicine]="med"
+          [wishlisted]="isWishlisted(med.id)"
+          (addToCart)="addToCart($event)"
+          (toggleWishlist)="toggleWishlist($event)"
+        ></app-product-card>
+      }
+    </div>
+    <app-paginator [pagination]="pagination()" (pageChange)="onPageChange($event)"></app-paginator>
+  }
+</div>

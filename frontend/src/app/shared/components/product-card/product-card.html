@@ -1,0 +1,47 @@
+<article class="product-card">
+  @if (showWishlist) {
+    <button
+      type="button"
+      class="wishlist-btn"
+      [class.active]="wishlisted"
+      (click)="toggleWishlist.emit(medicine)"
+      [attr.aria-label]="wishlisted ? 'Remove from wishlist' : 'Add to wishlist'"
+    >
+      {{ wishlisted ? '♥' : '♡' }}
+    </button>
+  }
+
+  <a class="product-media" [routerLink]="['/medicines', medicine.id]">
+    @if (medicine.image) {
+      <img [src]="medicine.image" [alt]="medicine.name" loading="lazy" />
+    } @else {
+      <div class="media-placeholder">{{ placeholderInitial }}</div>
+    }
+  </a>
+
+  <div class="product-body">
+    @if (medicine.categoryName) {
+      <span class="product-category">{{ medicine.categoryName }}</span>
+    }
+    <a class="product-name" [routerLink]="['/medicines', medicine.id]">{{ medicine.name }}</a>
+    <p class="product-manufacturer">{{ medicine.manufacturer || 'Generic' }}</p>
+
+    <div class="product-tags">
+      @if (medicine.prescriptionRequired) {
+        <span class="badge badge-warning">Rx required</span>
+      }
+      @if (inStock) {
+        <span class="badge badge-success">In stock</span>
+      } @else {
+        <span class="badge badge-danger">Out of stock</span>
+      }
+    </div>
+
+    <div class="product-footer">
+      <span class="product-price">{{ medicine.price | currency }}</span>
+      <button type="button" class="btn btn-primary btn-sm" [disabled]="!inStock" (click)="addToCart.emit(medicine)">
+        Add to cart
+      </button>
+    </div>
+  </div>
+</article>

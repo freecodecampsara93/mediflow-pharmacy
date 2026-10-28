@@ -1,0 +1,128 @@
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-5);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: var(--space-7);
+}
+
+.detail-media {
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+}
+
+.detail-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 800;
+  color: var(--color-primary-300);
+  background: linear-gradient(135deg, var(--color-primary-50), var(--color-primary-100));
+}
+
+.product-category {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary-600);
+}
+
+.manufacturer {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary-700);
+  margin-bottom: var(--space-4);
+}
+
+.description {
+  margin-bottom: var(--space-5);
+}
+
+.purchase-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.qty-control button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: var(--color-surface-alt);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.qty-control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-control span {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.active-wish {
+  color: #e0455a;
+  border-color: #f3c3ca;
+}
+
+.info-note {
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  font-size: 0.8rem;
+  color: var(--color-primary-800);
+}
+
+@media (max-width: 800px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,92 @@
+<div class="admin-page-heading">
+  <div>
+    <h1>Inventory</h1>
+    <p class="text-muted">Monitor stock levels and adjust thresholds.</p>
+  </div>
+</div>
+
+<div class="admin-toolbar">
+  <label class="checkbox-field">
+    <input type="checkbox" [checked]="lowStockOnly()" (change)="toggleLowStock()" />
+    Show low stock only
+  </label>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading inventory..."></app-loading-spinner>
+} @else if (error()) {
+  <app-empty-state icon="⚠️" title="Could not load inventory" [message]="error()">
+    <button type="button" class="btn btn-secondary" (click)="load()">Try again</button>
+  </app-empty-state>
+} @else if (!inventory().length) {
+  <app-empty-state icon="📦" title="Nothing to show" message="No inventory records match this filter."></app-empty-state>
+} @else {
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Medicine</th>
+          <th>Total stock</th>
+          <th>Minimum stock</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of inventory(); track item.medicineId) {
+          <tr>
+            <td>{{ item.medicineName || 'Medicine #' + item.medicineId }}</td>
+            <td>{{ item.totalStock }}</td>
+            <td>{{ item.minimumStock }}</td>
+            <td>
+              @if (isLow(item)) {
+                <span class="badge badge-warning">Low stock</span>
+              } @else {
+                <span class="badge badge-success">Healthy</span>
+              }
+            </td>
+            <td class="row-actions">
+              <button type="button" class="btn btn-secondary btn-sm" (click)="openEdit(item)">Adjust</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <h3>Adjust stock — {{ editing()?.medicineName }}</h3>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="field" [class.has-error]="isInvalid('totalStock')">
+          <label for="i-total">Total stock</label>
+          <input id="i-total" type="number" min="0" formControlName="totalStock" />
+          @if (isInvalid('totalStock')) {
+            <span class="error-text">Total stock cannot be negative.</span>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="isInvalid('minimumStock')">
+          <label for="i-minimum">Minimum stock threshold</label>
+          <input id="i-minimum" type="number" min="0" formControlName="minimumStock" />
+          @if (isInvalid('minimumStock')) {
+            <span class="error-text">Minimum stock cannot be negative.</span>
+          }
+        </div>
+
+        @if (formError()) {
+          <p class="error-text">{{ formError() }}</p>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
